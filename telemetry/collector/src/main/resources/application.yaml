@@ -1,0 +1,15 @@
+
+server:
+  kafka:
+    address: ${SERVER_KAFKA_ADDRESS:localhost:9092}
+    topic-config:
+      hubs: telemetry.hubs.v1
+      sensors: telemetry.sensors.v1
+
+logging:
+  level:
+    ru.yandex.practicum: TRACE
+    org:
+      springframework: ERROR
+      apache.kafka: WARN
+
