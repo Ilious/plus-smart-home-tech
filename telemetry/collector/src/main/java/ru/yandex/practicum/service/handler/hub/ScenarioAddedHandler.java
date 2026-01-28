@@ -2,21 +2,14 @@ package ru.yandex.practicum.service.handler.hub;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.*;
-import ru.yandex.practicum.model.hub.DeviceAction;
-import ru.yandex.practicum.model.hub.DeviceAdded;
 import ru.yandex.practicum.model.hub.ScenarioAdded;
 import ru.yandex.practicum.model.hub.ScenarioCondition;
 import ru.yandex.practicum.model.hub.base.HubEvent;
-import ru.yandex.practicum.model.hub.enums.ActionType;
-import ru.yandex.practicum.model.hub.enums.ConditionOperation;
-import ru.yandex.practicum.model.hub.enums.ConditionType;
 import ru.yandex.practicum.model.hub.enums.HubEventType;
 import ru.yandex.practicum.service.KafkaEventProducer;
 import ru.yandex.practicum.service.handler.hub.base.BaseHubEventHandler;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Component
 public class ScenarioAddedHandler extends BaseHubEventHandler<ScenarioAddedEventAvro> {
