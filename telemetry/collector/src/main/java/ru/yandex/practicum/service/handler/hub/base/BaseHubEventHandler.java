@@ -2,6 +2,7 @@ package ru.yandex.practicum.service.handler.hub.base;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecordBase;
+import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.model.hub.base.HubEvent;
 import ru.yandex.practicum.service.KafkaEventProducer;
 import ru.yandex.practicum.service.handler.HubEventHandler;
@@ -15,6 +16,18 @@ public abstract class BaseHubEventHandler<T extends SpecificRecordBase> implemen
 
     @Override
     public void handle(HubEvent event) {
-        producer.sendHubEvent(mapToAvro(event), event.getHubId(), event.getTimestamp());
+        if (!event.getType().equals(getMessageType())) {
+            throw new IllegalArgumentException("Unknown hub event type: " + event.getType());
+        }
+
+        T payload = mapToAvro(event);
+
+        HubEventAvro avroEvent = HubEventAvro.newBuilder()
+                .setHubId(event.getHubId())
+                .setPayload(payload)
+                .setTimestamp(event.getTimestamp())
+                .build();
+
+        producer.sendHubEvent(avroEvent, event.getHubId(), event.getTimestamp());
     }
 }

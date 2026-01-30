@@ -20,10 +20,10 @@ import java.time.Instant;
         property = "type"
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = DeviceAdded.class, name = "DEVICE_ADDED_EVENT"),
-        @JsonSubTypes.Type(value = DeviceRemoved.class, name = "DEVICE_REMOVED_EVENT"),
-        @JsonSubTypes.Type(value = ScenarioAdded.class, name = "SCENARIO_ADDED_EVENT"),
-        @JsonSubTypes.Type(value = ScenarioRemoved.class, name = "SCENARIO_REMOVED_EVENT")
+        @JsonSubTypes.Type(value = DeviceAdded.class, name = "DEVICE_ADDED"),
+        @JsonSubTypes.Type(value = DeviceRemoved.class, name = "DEVICE_REMOVED"),
+        @JsonSubTypes.Type(value = ScenarioAdded.class, name = "SCENARIO_ADDED"),
+        @JsonSubTypes.Type(value = ScenarioRemoved.class, name = "SCENARIO_REMOVED")
 })
 @Getter @Setter
 @ToString

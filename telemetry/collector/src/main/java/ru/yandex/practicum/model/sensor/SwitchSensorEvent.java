@@ -13,7 +13,7 @@ public class SwitchSensorEvent extends SensorEvent {
     private boolean state;
 
     @Override
-    public SensorEventType getEventType() {
+    public SensorEventType getType() {
         return SensorEventType.SWITCH_SENSOR_EVENT;
     }
 }

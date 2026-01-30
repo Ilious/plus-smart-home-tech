@@ -35,15 +35,16 @@ public class EventController {
                 .collect(Collectors.toMap(SensorEventHandler::getMessageType, Function.identity()));
         this.hubEvents = hubs.stream()
                 .collect(Collectors.toMap(HubEventHandler::getMessageType, Function.identity()));
+        log.info("Registered sensor handlers {}", sensorsEvents);
     }
 
     @PostMapping("/sensors")
     public void collectSensorEvent(@Valid @RequestBody SensorEvent event) {
         log.info("json sensorEvent {}", event);
-        SensorEventHandler handler = sensorsEvents.get(event.getEventType());
+        SensorEventHandler handler = sensorsEvents.get(event.getType());
 
         if (handler == null) {
-            throw new IllegalArgumentException("Can't find handler for event " + event.getEventType());
+            throw new IllegalArgumentException("Can't find handler for event " + event.getType());
         }
         handler.handle(event);
     }

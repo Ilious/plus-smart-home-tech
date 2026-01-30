@@ -17,7 +17,7 @@ public class MotionSensorEvent extends SensorEvent {
     private int voltage;
 
     @Override
-    public SensorEventType getEventType() {
+    public SensorEventType getType() {
         return SensorEventType.MOTION_SENSOR_EVENT;
     }
 }

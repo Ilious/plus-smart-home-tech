@@ -28,14 +28,18 @@ public class ScenarioAddedHandler extends BaseHubEventHandler<ScenarioAddedEvent
         ScenarioAdded scenarioAdded = (ScenarioAdded) hubEvent;
         return ScenarioAddedEventAvro.newBuilder()
                 .setName(scenarioAdded.getName())
-                .setActions(mapToAvroActions(scenarioAdded))
+                .setActions(mapToAvroDeviceActions(scenarioAdded))
                 .setConditions(mapToAvroConditions(scenarioAdded))
                 .build();
     }
 
-    private List<ActionTypeAvro> mapToAvroActions(ScenarioAdded scenarioAdded) {
+    private List<DeviceActionAvro> mapToAvroDeviceActions(ScenarioAdded scenarioAdded) {
         return scenarioAdded.getActions().stream()
-                .map(action -> ActionTypeAvro.valueOf(action.toString()))
+                .map(deviceAction -> DeviceActionAvro.newBuilder()
+                        .setSensorId(deviceAction.getSensorId())
+                        .setType(ActionTypeAvro.valueOf(deviceAction.getType().name()))
+                        .setValue(deviceAction.getValue())
+                        .build())
                 .toList();
     }
 
