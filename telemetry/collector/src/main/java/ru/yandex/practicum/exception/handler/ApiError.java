@@ -6,6 +6,6 @@ import lombok.Setter;
 
 @Getter @Setter @AllArgsConstructor
 public class ApiError {
-    String message;
-    int value;
+    private final String message;
+    private final int value;
 }
