@@ -18,7 +18,7 @@ public class KafkaEventProducer implements AutoCloseable {
 
     private final KafkaTopicConfig topicConfig;
 
-    private Producer<String, SpecificRecordBase> producer;
+    private final Producer<String, SpecificRecordBase> producer;
 
     public void send(String topic, String key, Instant timestamp, SpecificRecordBase data) {
         ProducerRecord<String, SpecificRecordBase> record = new ProducerRecord<>(
@@ -45,7 +45,7 @@ public class KafkaEventProducer implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         producer.flush();
         producer.close(Duration.ofSeconds(5));
     }

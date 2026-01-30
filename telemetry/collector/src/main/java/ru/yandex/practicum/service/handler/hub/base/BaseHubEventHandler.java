@@ -15,8 +15,6 @@ public abstract class BaseHubEventHandler<T extends SpecificRecordBase> implemen
 
     @Override
     public void handle(HubEvent event) {
-
-
-        producer.sendSensorEvent(mapToAvro(event), event.getHubId(), event.getTimestamp());
+        producer.sendHubEvent(mapToAvro(event), event.getHubId(), event.getTimestamp());
     }
 }

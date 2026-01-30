@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 @RequestMapping(path = "/events", consumes = MediaType.APPLICATION_JSON_VALUE)
 public class EventController {
 
-    private Map<SensorEventType, SensorEventHandler> sensorsEvents;
+    private final Map<SensorEventType, SensorEventHandler> sensorsEvents;
 
-    private Map<HubEventType, HubEventHandler> hubEvents;
+    private final Map<HubEventType, HubEventHandler> hubEvents;
 
     public EventController(Set<SensorEventHandler> sensors, Set<HubEventHandler> hubs) {
         this.sensorsEvents = sensors.stream()
