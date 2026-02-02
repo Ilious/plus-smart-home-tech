@@ -3,6 +3,7 @@ package ru.yandex.practicum.model.hub.base;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -34,5 +35,6 @@ public abstract class HubEvent {
 
     private Instant timestamp = Instant.now();
 
+    @NotNull
     public abstract HubEventType getType();
 }

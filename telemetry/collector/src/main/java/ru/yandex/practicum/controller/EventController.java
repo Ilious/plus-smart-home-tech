@@ -33,7 +33,6 @@ public class EventController {
                 .collect(Collectors.toMap(SensorEventHandler::getMessageType, Function.identity()));
         this.hubEvents = hubs.stream()
                 .collect(Collectors.toMap(HubEventHandler::getMessageType, Function.identity()));
-        log.info("Registered sensor handlers {}", sensorsEvents);
     }
 
     @PostMapping("/sensors")
