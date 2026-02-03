@@ -17,7 +17,7 @@ public class ScenarioAddedHandler extends BaseHubEventHandler<ScenarioAddedEvent
 
     @Override
     public HubEventProto.PayloadCase getMessageType() {
-        return HubEventProto.PayloadCase.DEVICE_REMOVED;
+        return HubEventProto.PayloadCase.SCENARIO_ADDED;
     }
 
     @Override
