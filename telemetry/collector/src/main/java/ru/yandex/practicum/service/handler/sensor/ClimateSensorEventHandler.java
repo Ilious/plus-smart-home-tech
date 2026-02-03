@@ -16,12 +16,12 @@ public class ClimateSensorEventHandler extends BaseSensorEventHandler<ClimateSen
 
     @Override
     public SensorEventProto.PayloadCase getMessageType() {
-        return SensorEventProto.PayloadCase.CLIMATE_SENSOR;
+        return SensorEventProto.PayloadCase.CLIMATE_SENSOR_EVENT;
     }
 
     @Override
     protected ClimateSensorAvro toMessage(SensorEventProto event) {
-        ClimateSensorProto climateSensor = event.getClimateSensor();
+        ClimateSensorProto climateSensor = event.getClimateSensorEvent();
         return ClimateSensorAvro.newBuilder()
                 .setCo2Level(climateSensor.getCo2Level())
                 .setHumidity(climateSensor.getHumidity())
