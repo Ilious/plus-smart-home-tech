@@ -12,7 +12,7 @@ spring:
       auto-offset-reset: earliest
       enable-auto-commit: false
       key-deserializer: "org.apache.kafka.common.serialization.StringDeserializer"
-      value-deserializer: "ru.yandex.practicum.serializer.BaseAvroDeserializer"
+      value-deserializer: "ru.yandex.practicum.deserializer.SensorEventDeserializer"
 
     producer:
       client-id: aggregator-producer
