@@ -23,6 +23,6 @@ spring:
 
 logging:
   level:
-    ru.yandex.practicum: WARN
+    ru.yandex.practicum: DEBUG
     org.apache.kafka: WARN
     org.springframework.kafka: WARN

@@ -78,7 +78,7 @@ public class AggregationStarter {
     }
 
     private void handleRecord(ConsumerRecord<String, SensorEventAvro> record) {
-        log.debug("handled Record: topic {}, partition {}, offset {}, value {}",
+        log.trace("handled Record: topic {}, partition {}, offset {}, value {}",
                 record.topic(), record.partition(), record.offset(), record.value());
         Optional<SensorsSnapshotAvro> sensorsSnapshotAvro = aggregationService.updateState(record.value());
 
