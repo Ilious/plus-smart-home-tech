@@ -39,10 +39,7 @@ public class AggregationStarter {
     public void start() {
         try {
             consumer.subscribe(List.of(topicConfig.getSensors()));
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                log.info("Got stop signal. Stopping aggregationStarter");
-                consumer.wakeup();
-            }));
+            Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
 
             while (true) {
                 ConsumerRecords<String, SensorEventAvro> records = consumer.poll(
@@ -57,8 +54,9 @@ public class AggregationStarter {
             }
 
         } catch (WakeupException ignored) {
+            log.warn("AggregationStarter got stop signal. Stopping aggregationStarter");
         } catch (Exception e) {
-            log.error("Ошибка во время обработки событий от датчиков", e);
+            log.error("Error in AggregationStarter during handling records", e);
         } finally {
 
             try {
@@ -66,9 +64,9 @@ public class AggregationStarter {
                 consumer.commitAsync();
 
             } finally {
-                log.info("Закрываем консьюмер");
+                log.info("Closing consumer");
                 consumer.close();
-                log.info("Закрываем продюсер");
+                log.info("Closing producer");
                 producer.close();
             }
         }

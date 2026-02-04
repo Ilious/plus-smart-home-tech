@@ -1,6 +1,5 @@
 package ru.yandex.practicum.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
@@ -19,6 +18,6 @@ public class HubEventClient {
     }
 
     public void handleDeviceAction(DeviceActionRequest request) {
-
+//        request.
     }
 }
