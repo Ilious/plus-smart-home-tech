@@ -1,0 +1,33 @@
+server:
+  kafka:
+    topic-config:
+      hubs: telemetry.hubs.v1
+      sensors: telemetry.sensors.v1
+      snapshots: telemetry.snapshots.v1
+grpc:
+  client:
+    GLOBAL:
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
+spring:
+  kafka:
+    consumer:
+      group-id: analyzer-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: "org.apache.kafka.common.serialization.StringDeserializer"
+      value-deserializer: "ru.yandex.practicum.deserializer.SensorEventDeserializer"
+
+#    producer:
+#      client-id: aggregator-producer
+#      acks: 1
+#      key-serializer: "org.apache.kafka.common.serialization.StringSerializer"
+#      value-serializer: "ru.yandex.practicum.serializer.AvroSerializer"
+#    bootstrap-servers: ${SERVER_KAFKA_ADDRESS:localhost:9092}
+
+logging:
+  level:
+    ru.yandex.practicum: TRACE
+    org.apache.kafka: WARN
+    org.springframework.kafka: WARN

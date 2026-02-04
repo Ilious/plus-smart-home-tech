@@ -1,35 +1,30 @@
 package ru.yandex.practicum.config;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Map;
 import java.util.Properties;
 
 @Configuration
+@RequiredArgsConstructor
 public class KafkaConfig {
 
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String serverAddress;
+    private final KafkaConfigData kafkaConfigData;
 
     @Bean
-    public KafkaProducer<String, SpecificRecordBase> getProducer(
-            @Value("${spring.kafka.producer.key-serializer}") String keySerializer,
-            @Value("${spring.kafka.producer.value-serializer}") String valueSerializer,
-            @Value("${spring.kafka.producer.client-id}") String clientId,
-            @Value("${spring.kafka.producer.acks}") String acks
-    ) {
-        Properties config = new Properties();
-
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, serverAddress);
-        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
-        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
-        config.put(ProducerConfig.CLIENT_ID_CONFIG, clientId);
-        config.put(ProducerConfig.ACKS_CONFIG, acks);
-
-        return new KafkaProducer<>(config);
+    public KafkaProducer<String, SpecificRecordBase> getProducer() {
+        KafkaConfigData.Producer producerConfig = kafkaConfigData.getProducer();
+        return new KafkaProducer<>(producerConfig.getProperties());
     }
 }
