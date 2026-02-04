@@ -2,6 +2,15 @@ spring:
   main:
     banner-mode: off
 
+  kafka:
+    bootstrap-servers: ${SERVER_KAFKA_ADDRESS:localhost:9092}
+
+    producer:
+      client-id: collector-producer
+      acks: 1
+      key-serializer: "org.apache.kafka.common.serialization.StringSerializer"
+      value-serializer: "ru.yandex.practicum.serializer.AvroSerializer"
+
 grpc:
   server:
     port: 59091
@@ -19,12 +28,3 @@ logging:
     org:
       springframework: ERROR
       apache.kafka: WARN
-spring:
-  kafka:
-    bootstrap-servers: ${SERVER_KAFKA_ADDRESS:localhost:9092}
-
-    producer:
-      client-id: collector-producer
-      acks: 1
-      key-serializer: "org.apache.kafka.common.serialization.StringSerializer"
-      value-serializer: "ru.yandex.practicum.serializer.AvroSerializer"
