@@ -2,16 +2,25 @@ spring:
   main:
     banner-mode: off
 
+  kafka:
+    bootstrap-servers: ${SERVER_KAFKA_ADDRESS:localhost:9092}
+
+    producer:
+      client-id: collector-producer
+      acks: 1
+      key-serializer: "org.apache.kafka.common.serialization.StringSerializer"
+      value-serializer: "ru.yandex.practicum.serializer.AvroSerializer"
+
 grpc:
   server:
     port: 59091
 
 server:
   kafka:
-    address: ${SERVER_KAFKA_ADDRESS:localhost:9092}
     topic-config:
       hubs: telemetry.hubs.v1
       sensors: telemetry.sensors.v1
+
 
 logging:
   level:
@@ -19,4 +28,3 @@ logging:
     org:
       springframework: ERROR
       apache.kafka: WARN
-
