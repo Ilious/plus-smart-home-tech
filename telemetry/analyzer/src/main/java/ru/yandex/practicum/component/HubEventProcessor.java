@@ -6,57 +6,45 @@ import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.config.KafkaTopicConfig;
-import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
-import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
-import ru.yandex.practicum.service.HubEventClient;
+import ru.yandex.practicum.kafka.telemetry.event.*;
+import ru.yandex.practicum.service.ScenarioService;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class HubEventProcessor implements Runnable {
-
-    @Value("${server.kafka.consumer.poll-timeout-ms:5000}")
-    public int pollDurationMillis;
-
-    @Value("${server.kafka.hubEventProcessor.batch-messages-count:10}")
-    public int batchMessagesCount;
+public class HubEventProcessor extends BaseProcessor<HubEventAvro> implements Runnable {
 
     private final KafkaTopicConfig kafkaTopicConfig;
 
-    private final KafkaConsumer<String, SensorsSnapshotAvro> consumer;
+    private final KafkaConsumer<String, HubEventAvro> consumer;
 
     private final KafkaProducer<String, SpecificRecordBase> producer;
 
-    private final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
-
-    private final HubEventClient hubEventClient;
+    private final ScenarioService scenarioService;
 
     @Override
     public void run() {
         try {
-            consumer.subscribe(List.of(kafkaTopicConfig.getSensors()));
+            consumer.subscribe(List.of(kafkaTopicConfig.getHubs()));
             Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
 
             while (true) {
-                ConsumerRecords<String, SensorsSnapshotAvro> records = consumer.poll(Duration.ofMillis(pollDurationMillis));
+                ConsumerRecords<String, HubEventAvro> records = consumer.poll(
+                        Duration.ofMillis(pollDurationMillis)
+                );
 
                 int count = 0;
-                for (ConsumerRecord<String, SensorsSnapshotAvro> record : records) {
+                for (ConsumerRecord<String, HubEventAvro> record : records) {
                     handleRecord(record);
 
-                    manageOffset(record, count);
+                    manageOffset(record, count, consumer);
 
                     count++;
                 }
@@ -64,9 +52,9 @@ public class HubEventProcessor implements Runnable {
                 consumer.commitAsync();
             }
         } catch (WakeupException e) {
-            log.warn("HubEventProcessor got stop signal. Stopping aggregationStarter");
+            log.warn("Got stop signal. Stopping aggregationStarter");
         } catch (Exception e) {
-            log.error("Error in HubEventProcessor during handling records", e);
+            log.error("Error during handling records", e);
         } finally {
             try {
                 producer.flush();
@@ -80,31 +68,26 @@ public class HubEventProcessor implements Runnable {
         }
     }
 
-    private void manageOffset(ConsumerRecord<String, SensorsSnapshotAvro> record, int count) {
-        log.trace("[HubEventProcessor] - Received record: {}, topic {}, partition {}, offset {}", record.value(), record.topic(), record.partition(), record.offset());
-        currentOffsets.put(
-                new TopicPartition(record.topic(), record.partition()),
-                new OffsetAndMetadata(record.offset() + 1)
-        );
-
-        if (count % batchMessagesCount == 0) {
-            consumer.commitAsync(currentOffsets, (offset, exception) -> {
-                if (exception != null) {
-                    log.warn("[HubEventProcessor] - Error during fixing offsets: {}", currentOffsets, exception);
-                }
-            });
-        }
-    }
-
-    private void handleRecord(ConsumerRecord<String, SensorsSnapshotAvro> record) {
-        log.trace("[HubEventProcessor] - handled Record: topic {}, partition {}, offset {}, value {}",
+    @Override
+    public void handleRecord(ConsumerRecord<String, HubEventAvro> record) {
+        log.trace("handled Record: topic {}, partition {}, offset {}, value {}",
                 record.topic(), record.partition(), record.offset(), record.value());
 
-        Map<String, SensorStateAvro> sensorsState = record.value().getSensorsState();
+        Object payload = record.value().getPayload();
+        String hubId = record.value().getHubId();
 
-        // Todo
-//        sensorsState.get()
-//
-//        hubEventClient.handleDeviceAction(record.value().);
+        switch (payload) {
+            case DeviceAddedEventAvro deviceAddedEvent ->
+                    scenarioService.addDevice(hubId, deviceAddedEvent);
+            case DeviceRemovedEventAvro deviceRemovedEventAvro ->
+                    scenarioService.removeDevice(hubId, deviceRemovedEventAvro);
+            case ScenarioAddedEventAvro scenarioAddedEventAvro ->
+                    scenarioService.addScenario(hubId, scenarioAddedEventAvro);
+            case ScenarioRemovedEventAvro scenarioRemovedEventAvro ->
+                    scenarioService.removeScenario(hubId, scenarioRemovedEventAvro);
+            default -> log.warn("unhandled unknown Scenario: hubId {}",
+                    record.value().getHubId()
+            );
+        }
     }
 }

@@ -1,13 +1,15 @@
 package ru.yandex.practicum.dal.dao;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import ru.yandex.practicum.kafka.telemetry.event.ActionTypeAvro;
 
 @Entity
 @Table(name = "actions")
 @Getter @Setter
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class Action {
 
     @Id

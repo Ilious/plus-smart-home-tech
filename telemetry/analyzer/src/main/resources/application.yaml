@@ -4,8 +4,10 @@ server:
       hubs: telemetry.hubs.v1
       sensors: telemetry.sensors.v1
       snapshots: telemetry.snapshots.v1
-    hubEventProcessor:
-      batch-messages-count: 10
+    consumer:
+      poll-timeout-ms: 100
+      batch-messages-count: 100
+
 grpc:
   client:
     hub-router:
@@ -21,11 +23,9 @@ spring:
     consumer:
       properties:
         "bootstrap.servers": ${spring.kafka.bootstrap-servers}
-        "group.id": analyzer-group
         "auto.offset.reset": earliest
         "enable.auto.commit": false
         "key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer"
-        "value.deserializer": "ru.yandex.practicum.deserializer.SensorEventDeserializer"
 
     producer:
       properties:
@@ -39,7 +39,7 @@ spring:
       dialect: postgresql
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://127.0.0.1:5432/telemetry_analyzer}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://127.0.0.1:6000/telemetry_analyzer}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
   sql:

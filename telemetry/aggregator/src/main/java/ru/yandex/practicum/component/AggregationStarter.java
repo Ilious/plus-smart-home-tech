@@ -9,9 +9,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.errors.WakeupException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.config.KafkaTopicConfig;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 import ru.yandex.practicum.service.AggregationService;
@@ -23,18 +21,13 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AggregationStarter {
-
-    @Value("${server.kafka.consumer.poll-timeout-ms:5000}")
-    public int pollDurationMillis;
+public class AggregationStarter extends BaseProcessor<SensorEventAvro> {
 
     private final AggregationService aggregationService;
 
     private final KafkaConsumer<String, SensorEventAvro> consumer;
 
     private final KafkaProducer<String, SpecificRecordBase> producer;
-
-    private final KafkaTopicConfig topicConfig;
 
     public void start() {
         try {
@@ -46,10 +39,14 @@ public class AggregationStarter {
                         Duration.ofMillis(pollDurationMillis)
                 );
 
+                int count = 0;
                 for (ConsumerRecord<String, SensorEventAvro> record : records) {
                     handleRecord(record);
-                }
 
+                    manageOffset(record, count, consumer);
+
+                    count++;
+                }
                 consumer.commitAsync();
             }
 
@@ -72,7 +69,7 @@ public class AggregationStarter {
         }
     }
 
-    private void handleRecord(ConsumerRecord<String, SensorEventAvro> record) {
+    public void handleRecord(ConsumerRecord<String, SensorEventAvro> record) {
         log.trace("handled Record: topic {}, partition {}, offset {}, value {}",
                 record.topic(), record.partition(), record.offset(), record.value());
         Optional<SensorsSnapshotAvro> sensorsSnapshotAvro = aggregationService.updateState(record.value());

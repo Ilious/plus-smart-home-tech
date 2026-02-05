@@ -6,6 +6,7 @@ server:
       snapshots: telemetry.snapshots.v1
     consumer:
       poll-timeout-ms: 100
+      batch-messages-count: 100
 
 
 spring:
@@ -32,6 +33,6 @@ spring:
 
 logging:
   level:
-    ru.yandex.practicum: DEBUG
+    ru.yandex.practicum: TRACE
     org.apache.kafka: WARN
     org.springframework.kafka: WARN

@@ -10,7 +10,10 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.config.KafkaTopicConfig;
+import ru.yandex.practicum.dal.dao.Scenario;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
+import ru.yandex.practicum.service.AnalyzerService;
+import ru.yandex.practicum.service.HubEventClient;
 
 import java.time.Duration;
 import java.util.List;
@@ -18,62 +21,63 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SnapshotProcessor {
+public class SnapshotProcessor extends BaseProcessor<SensorsSnapshotAvro> {
 
-    public static final int POLL_DURATION_MILLIS = 1000;
+    private final KafkaTopicConfig topicConfig;
 
     private final KafkaConsumer<String, SensorsSnapshotAvro> consumer;
 
     private final KafkaProducer<String, SpecificRecordBase> producer;
 
-    private final KafkaTopicConfig topicConfig;
+    private final AnalyzerService analyzerService;
+
+    private final HubEventClient hubEventClient;
 
     public void start() {
         try {
-            consumer.subscribe(List.of(topicConfig.getSensors()));
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                log.info("Got stop signal. Stopping aggregationStarter");
-                consumer.wakeup();
-            }));
+            consumer.subscribe(List.of(topicConfig.getSnapshots()));
+            Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
 
             while (true) {
                 ConsumerRecords<String, SensorsSnapshotAvro> records = consumer.poll(
-                        Duration.ofMillis(POLL_DURATION_MILLIS)
+                        Duration.ofMillis(pollDurationMillis)
                 );
 
+                int count = 0;
                 for (ConsumerRecord<String, SensorsSnapshotAvro> record : records) {
                     handleRecord(record);
+
+                    manageOffset(record, count, consumer);
+
+                    count++;
                 }
 
                 consumer.commitAsync();
             }
 
-        } catch (WakeupException ignored) {
+        } catch (WakeupException e) {
+            log.warn("Got stop signal. Stopping aggregationStarter");
         } catch (Exception e) {
-            log.error("Ошибка во время обработки событий от датчиков", e);
+            log.error("Error during handling records", e);
         } finally {
-
             try {
                 producer.flush();
                 consumer.commitAsync();
-
             } finally {
-                log.info("Закрываем консьюмер");
+                log.info("Closing consumer");
                 consumer.close();
-                log.info("Закрываем продюсер");
+                log.info("Closing producer");
                 producer.close();
             }
         }
     }
 
-    private void handleRecord(ConsumerRecord<String, SensorsSnapshotAvro> record) {
-        log.trace("handled Record: topic {}, partition {}, offset {}, value {}",
+    @Override
+    public void handleRecord(ConsumerRecord<String, SensorsSnapshotAvro> record) {
+        log.trace("Handled Record: topic {}, partition {}, offset {}, value {}",
                 record.topic(), record.partition(), record.offset(), record.value());
-//        Optional<SensorsSnapshotAvro> sensorsSnapshotAvro = aggregationService.updateState(record.value());
-//
-//        sensorsSnapshotAvro.ifPresent(snapshotAvro -> {
-//            log.info("sending updated snapshot for hubId: {}", snapshotAvro.getHubId());
-//            producer.send(new ProducerRecord<>(topicConfig.getSnapshots(), snapshotAvro));
-//        });
+
+        List<Scenario> completeScenarios = analyzerService.analyze(record.value());
+        completeScenarios.forEach(hubEventClient::handleScenario);
     }
 }

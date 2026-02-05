@@ -2,8 +2,7 @@ package ru.yandex.practicum.dal.dao;
 
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +10,9 @@ import java.util.Map;
 @Entity
 @Table(name = "scenarios")
 @Getter @Setter
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class Scenario {
 
     @Id
@@ -21,7 +23,7 @@ public class Scenario {
 
     private String name;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @MapKeyColumn(
             table = "scenarios_conditions",
             name = "sensor_id"
@@ -33,7 +35,7 @@ public class Scenario {
     )
     private Map<String, Condition> conditions = new HashMap<>();
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @MapKeyColumn(
             table = "scenarios_actions",
             name = "sensor_id"
