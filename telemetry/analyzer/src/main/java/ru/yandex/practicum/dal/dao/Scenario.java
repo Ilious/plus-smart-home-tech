@@ -12,7 +12,7 @@ import java.util.Map;
 @Getter @Setter
 @Builder
 @AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class Scenario {
 
     @Id
@@ -23,25 +23,27 @@ public class Scenario {
 
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @MapKeyColumn(
-            table = "scenarios_conditions",
+            table = "scenario_conditions",
             name = "sensor_id"
     )
     @JoinTable(
-         name = "scenarios_conditions",
+         name = "scenario_conditions",
          joinColumns = @JoinColumn(name = "scenario_id"),
          inverseJoinColumns = @JoinColumn(name = "condition_id")
     )
     private Map<String, Condition> conditions = new HashMap<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @MapKeyColumn(
-            table = "scenarios_actions",
+            table = "scenario_actions",
             name = "sensor_id"
     )
     @JoinTable(
-         name = "scenarios_conditions",
+         name = "scenario_actions",
          joinColumns = @JoinColumn(name = "scenario_id"),
          inverseJoinColumns = @JoinColumn(name = "action_id")
     )

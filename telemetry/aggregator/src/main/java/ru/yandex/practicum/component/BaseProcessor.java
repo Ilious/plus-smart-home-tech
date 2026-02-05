@@ -7,7 +7,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Value;
-import ru.yandex.practicum.config.KafkaTopicConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,8 +19,6 @@ public abstract class BaseProcessor<T extends SpecificRecordBase> {
 
     @Value("${server.kafka.consumer.batch-messages-count:10}")
     protected int batchMessagesCount;
-
-    protected KafkaTopicConfig topicConfig;
 
     protected final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
 

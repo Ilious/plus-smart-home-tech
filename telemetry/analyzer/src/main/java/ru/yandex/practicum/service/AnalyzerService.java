@@ -55,7 +55,11 @@ public class AnalyzerService {
             return false;
 
         SensorStateAvro sensorState = snapshot.getSensorsState().get(sensorId);
+        if (sensorState == null || type == null)
+            return false;
+
         int sensorValue = getSensorValue(sensorState, type);
+
         return checkConditionValue(condition, condition.getValue(), sensorValue);
     }
 

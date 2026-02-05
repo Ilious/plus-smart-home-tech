@@ -10,6 +10,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.config.KafkaTopicConfig;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 import ru.yandex.practicum.service.AggregationService;
@@ -28,6 +29,8 @@ public class AggregationStarter extends BaseProcessor<SensorEventAvro> {
     private final KafkaConsumer<String, SensorEventAvro> consumer;
 
     private final KafkaProducer<String, SpecificRecordBase> producer;
+
+    private final KafkaTopicConfig topicConfig;
 
     public void start() {
         try {

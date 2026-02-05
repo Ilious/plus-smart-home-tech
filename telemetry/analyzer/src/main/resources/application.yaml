@@ -6,12 +6,12 @@ server:
       snapshots: telemetry.snapshots.v1
     consumer:
       poll-timeout-ms: 100
-      batch-messages-count: 100
+      batch-messages-count: 10
 
 grpc:
   client:
     hub-router:
-      address: 'static://127.0.0.1:59090'
+      address: 'static://localhost:59090'
       enable-keep-alive: true
       keep-alive-without-calls: true
       negotiation-type: plaintext
@@ -48,7 +48,7 @@ spring:
       schema-locations: classpath:db/schema-init.sql
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
 
 logging:

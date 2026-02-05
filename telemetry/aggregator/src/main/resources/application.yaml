@@ -6,7 +6,7 @@ server:
       snapshots: telemetry.snapshots.v1
     consumer:
       poll-timeout-ms: 100
-      batch-messages-count: 100
+      batch-messages-count: 10
 
 
 spring:
