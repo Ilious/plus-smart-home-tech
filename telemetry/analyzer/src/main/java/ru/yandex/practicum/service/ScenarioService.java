@@ -24,27 +24,25 @@ public class ScenarioService {
 
     private final ScenarioMappingHelper scenarioMapper;
 
+    @Transactional(readOnly = true)
     public List<Scenario> findAllByHubId(String hubId) {
         log.debug("findAllByHubId: hubId {}", hubId);
 
         return scenarioRepo.findAllByHubId(hubId);
     }
 
-    @Transactional
     public void addDevice(String hubId, DeviceAddedEventAvro event) {
         log.debug("AddDevice: hubId {}, id {}", hubId, event.getId());
 
         sensorService.createSensor(hubId, event);
     }
 
-    @Transactional
     public void removeDevice(String hubId, DeviceRemovedEventAvro event) {
         log.debug("RemoveDevice: hubId {}, id {}", hubId, event.getId());
 
         sensorService.removeByHubIdAndId(hubId, event.getId());
     }
 
-    @Transactional
     public void addScenario(String hubId, ScenarioAddedEventAvro event) {
         log.debug("Addition scenario: hubId {}, name {}", hubId, event.getName());
 
@@ -53,7 +51,6 @@ public class ScenarioService {
         scenarioRepo.save(scenario);
     }
 
-    @Transactional
     public void removeScenario(String hubId, ScenarioRemovedEventAvro event) {
         log.debug("RemoveScenario: hubId {}, name {}", hubId, event.getName());
 
