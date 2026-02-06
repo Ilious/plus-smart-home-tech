@@ -9,6 +9,8 @@ import ru.yandex.practicum.kafka.telemetry.event.DeviceAddedEventAvro;
 import ru.yandex.practicum.mapper.SensorMapper;
 import ru.yandex.practicum.repository.SensorRepo;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -43,5 +45,12 @@ public class SensorService {
         log.debug("Find sensor: hubId {}, id {}", hubId, id);
 
         return sensorRepo.findByIdAndHubId(id, hubId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> findExistingIdsByHubIdAndIdIn(String hubId, Collection<String> ids) {
+        log.debug("findExistingIdsByHubIdAndIdIn: hubId {}, ids.size() {}", hubId, ids.size());
+
+        return sensorRepo.findExistingIdsByHubIdAndIdIn(hubId, ids);
     }
 }

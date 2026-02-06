@@ -22,9 +22,9 @@ public abstract class BaseProcessor<T extends SpecificRecordBase> {
 
     protected final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
 
-    abstract void handleRecord(ConsumerRecord<String, T> record);
+    protected abstract void handleRecord(ConsumerRecord<String, T> record);
 
-    void manageOffset(ConsumerRecord<String, T> record, int count, KafkaConsumer<String, T> consumer) {
+    protected void manageOffset(ConsumerRecord<String, T> record, int count, KafkaConsumer<String, T> consumer) {
         log.trace("Received record: {}, topic {}, partition {}, offset {}",
                 record.value(), record.topic(), record.partition(), record.offset());
 

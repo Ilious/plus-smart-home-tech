@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ScenarioService {
 
@@ -23,7 +24,6 @@ public class ScenarioService {
 
     private final ScenarioMappingHelper scenarioMapper;
 
-    @Transactional(readOnly = true)
     public List<Scenario> findAllByHubId(String hubId) {
         log.debug("findAllByHubId: hubId {}", hubId);
 
@@ -63,5 +63,6 @@ public class ScenarioService {
                 () -> log.warn("Haven't found scenario: hubId {}, name {}",
                         hubId, event.getName())
         );
+
     }
 }
