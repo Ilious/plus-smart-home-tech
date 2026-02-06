@@ -2,9 +2,9 @@ package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.dal.dao.Condition;
-import ru.yandex.practicum.dal.dao.Scenario;
-import ru.yandex.practicum.dal.dao.Sensor;
+import ru.yandex.practicum.dao.Condition;
+import ru.yandex.practicum.dao.Scenario;
+import ru.yandex.practicum.dao.Sensor;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 
 import java.util.ArrayList;
@@ -55,10 +55,10 @@ public class AnalyzerService {
             return false;
 
         SensorStateAvro sensorState = snapshot.getSensorsState().get(sensorId);
-        if (sensorState == null || type == null)
+        if (sensorState == null)
             return false;
 
-        int sensorValue = getSensorValue(sensorState, type);
+        Integer sensorValue = getSensorValue(sensorState, type);
 
         return checkConditionValue(condition, condition.getValue(), sensorValue);
     }
@@ -66,12 +66,12 @@ public class AnalyzerService {
     private boolean checkConditionValue(Condition condition, int conditionValue, int sensorValue) {
         return switch (condition.getOperation()) {
             case EQUALS -> sensorValue == conditionValue;
-            case GREATER_THAN -> conditionValue > sensorValue;
-            case LOWER_THAN -> conditionValue < sensorValue;
+            case GREATER_THAN -> conditionValue < sensorValue;
+            case LOWER_THAN -> conditionValue > sensorValue;
         };
     }
 
-    private int getSensorValue(SensorStateAvro sensor, ConditionTypeAvro type) {
+    private Integer getSensorValue(SensorStateAvro sensor, ConditionTypeAvro type) {
         Object data = sensor.getData();
 
         return switch (type) {

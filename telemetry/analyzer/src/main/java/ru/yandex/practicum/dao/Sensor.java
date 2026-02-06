@@ -1,4 +1,4 @@
-package ru.yandex.practicum.dal.dao;
+package ru.yandex.practicum.dao;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,7 +8,7 @@ import lombok.*;
 @Getter @Setter
 @Builder
 @AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class Sensor {
 
     @Id

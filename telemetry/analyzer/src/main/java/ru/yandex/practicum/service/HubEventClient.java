@@ -4,8 +4,8 @@ import com.google.protobuf.Timestamp;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.dal.dao.Action;
-import ru.yandex.practicum.dal.dao.Scenario;
+import ru.yandex.practicum.dao.Action;
+import ru.yandex.practicum.dao.Scenario;
 import ru.yandex.practicum.grpc.telemetry.event.ActionTypeProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionRequest;
@@ -20,10 +20,10 @@ import java.util.Map;
 public class HubEventClient {
 
     @GrpcClient("hub-router")
-    private final HubRouterControllerGrpc.HubRouterControllerBlockingStub hubClient;
+    private final HubRouterControllerGrpc.HubRouterControllerBlockingStub hubRouterClient;
 
-    public HubEventClient(@GrpcClient("hub-router") HubRouterControllerGrpc.HubRouterControllerBlockingStub hubClient) {
-        this.hubClient = hubClient;
+    public HubEventClient(@GrpcClient("hub-router") HubRouterControllerGrpc.HubRouterControllerBlockingStub hubRouterClient) {
+        this.hubRouterClient = hubRouterClient;
     }
 
     public void handleScenario(Scenario request) {
@@ -48,15 +48,17 @@ public class HubEventClient {
             try {
                 log.info("Sending message, hubId {}, action {}", request.getHubId(), deviceAction);
 
-                hubClient.handleDeviceAction(DeviceActionRequest.newBuilder()
+                DeviceActionRequest build = DeviceActionRequest.newBuilder()
                         .setAction(deviceAction.build())
                         .setScenarioName(request.getName())
                         .setHubId(request.getHubId())
                         .setTimestamp(timestampProto)
-                        .build()
-                );
+                        .build();
+                log.trace("build {}", build);
+
+                hubRouterClient.handleDeviceAction(build);
             } catch (Exception ex) {
-                log.error("Error sending message, hubId {}, action {}", request.getHubId(), deviceAction, ex);
+                log.error("Error sending message, hubId {}, typeAction {}", request.getHubId(), deviceAction.getType(), ex);
             }
         }
     }

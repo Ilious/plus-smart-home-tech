@@ -1,4 +1,4 @@
-package ru.yandex.practicum.dal.dao;
+package ru.yandex.practicum.dao;
 
 
 import jakarta.persistence.*;
@@ -23,11 +23,9 @@ public class Scenario {
 
     private String name;
 
-    @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL)
     @MapKeyColumn(
-            table = "scenario_conditions",
-            name = "sensor_id"
+            name = "sensor_id", table = "scenario_conditions"
     )
     @JoinTable(
          name = "scenario_conditions",
@@ -36,11 +34,9 @@ public class Scenario {
     )
     private Map<String, Condition> conditions = new HashMap<>();
 
-    @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL)
     @MapKeyColumn(
-            table = "scenario_actions",
-            name = "sensor_id"
+            name = "sensor_id", table = "scenario_conditions"
     )
     @JoinTable(
          name = "scenario_actions",

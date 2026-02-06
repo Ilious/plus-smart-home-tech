@@ -42,14 +42,18 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://127.0.0.1:6000/telemetry_analyzer}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    hikari:
+      connection-timeout: 30000
+      initialization-fail-timeout: 0
   sql:
     init:
       mode: always
       schema-locations: classpath:db/schema-init.sql
   jpa:
     hibernate:
-      ddl-auto: validate
-    show-sql: false
+      ddl-auto: update
+    show-sql: true
+
 
 logging:
   level:

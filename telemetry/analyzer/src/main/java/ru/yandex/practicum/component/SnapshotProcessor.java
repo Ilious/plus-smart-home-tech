@@ -10,7 +10,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.config.KafkaTopicConfig;
-import ru.yandex.practicum.dal.dao.Scenario;
+import ru.yandex.practicum.dao.Scenario;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 import ru.yandex.practicum.service.AnalyzerService;
 import ru.yandex.practicum.service.HubEventClient;
@@ -74,7 +74,7 @@ public class SnapshotProcessor extends BaseProcessor<SensorsSnapshotAvro> {
 
     @Override
     public void handleRecord(ConsumerRecord<String, SensorsSnapshotAvro> record) {
-        log.trace("Handled Record: topic {}, partition {}, offset {}, value {}",
+        log.trace("Handling Record: topic {}, partition {}, offset {}, value {}",
                 record.topic(), record.partition(), record.offset(), record.value());
 
         List<Scenario> completeScenarios = analyzerService.analyze(record.value());

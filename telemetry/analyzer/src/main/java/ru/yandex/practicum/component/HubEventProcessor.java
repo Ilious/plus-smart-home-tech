@@ -70,7 +70,7 @@ public class HubEventProcessor extends BaseProcessor<HubEventAvro> implements Ru
 
     @Override
     public void handleRecord(ConsumerRecord<String, HubEventAvro> record) {
-        log.trace("handled Record: topic {}, partition {}, offset {}, value {}",
+        log.trace("Handling Record: topic {}, partition {}, offset {}, value {}",
                 record.topic(), record.partition(), record.offset(), record.value());
 
         Object payload = record.value().getPayload();

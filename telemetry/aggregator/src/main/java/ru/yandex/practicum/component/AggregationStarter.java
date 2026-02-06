@@ -73,7 +73,7 @@ public class AggregationStarter extends BaseProcessor<SensorEventAvro> {
     }
 
     public void handleRecord(ConsumerRecord<String, SensorEventAvro> record) {
-        log.trace("handled Record: topic {}, partition {}, offset {}, value {}",
+        log.trace("Handling Record: topic {}, partition {}, offset {}, value {}",
                 record.topic(), record.partition(), record.offset(), record.value());
         Optional<SensorsSnapshotAvro> sensorsSnapshotAvro = aggregationService.updateState(record.value());
 

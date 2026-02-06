@@ -1,4 +1,4 @@
-package ru.yandex.practicum.dal.dao;
+package ru.yandex.practicum.dao;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,7 +10,7 @@ import ru.yandex.practicum.kafka.telemetry.event.ConditionTypeAvro;
 @Getter @Setter
 @Builder
 @AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class Condition {
 
     @Id
