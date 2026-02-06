@@ -7,62 +7,62 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.config.KafkaTopicConfig;
-import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
+import ru.yandex.practicum.dao.Scenario;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
-import ru.yandex.practicum.service.AggregationService;
+import ru.yandex.practicum.service.AnalyzerService;
+import ru.yandex.practicum.service.HubEventClient;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AggregationStarter extends BaseProcessor<SensorEventAvro> {
-
-    private final AggregationService aggregationService;
-
-    private final KafkaConsumer<String, SensorEventAvro> consumer;
-
-    private final KafkaProducer<String, SpecificRecordBase> producer;
+public class SnapshotProcessor extends BaseProcessor<SensorsSnapshotAvro> {
 
     private final KafkaTopicConfig topicConfig;
 
+    private final KafkaConsumer<String, SensorsSnapshotAvro> consumer;
+
+    private final KafkaProducer<String, SpecificRecordBase> producer;
+
+    private final AnalyzerService analyzerService;
+
+    private final HubEventClient hubEventClient;
+
     public void start() {
         try {
-            consumer.subscribe(List.of(topicConfig.getSensors()));
+            consumer.subscribe(List.of(topicConfig.getSnapshots()));
             Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
 
             while (true) {
-                ConsumerRecords<String, SensorEventAvro> records = consumer.poll(
+                ConsumerRecords<String, SensorsSnapshotAvro> records = consumer.poll(
                         Duration.ofMillis(pollDurationMillis)
                 );
 
                 int count = 0;
-                for (ConsumerRecord<String, SensorEventAvro> record : records) {
+                for (ConsumerRecord<String, SensorsSnapshotAvro> record : records) {
                     handleRecord(record);
 
                     manageOffset(record, count, consumer);
 
                     count++;
                 }
+
                 consumer.commitAsync();
             }
 
-        } catch (WakeupException ignored) {
-            log.warn("AggregationStarter got stop signal. Stopping aggregationStarter");
+        } catch (WakeupException e) {
+            log.warn("Got stop signal. Stopping aggregationStarter");
         } catch (Exception e) {
-            log.error("Error in AggregationStarter during handling records", e);
+            log.error("Error during handling records", e);
         } finally {
-
             try {
                 producer.flush();
                 consumer.commitAsync();
-
             } finally {
                 log.info("Closing consumer");
                 consumer.close();
@@ -72,14 +72,12 @@ public class AggregationStarter extends BaseProcessor<SensorEventAvro> {
         }
     }
 
-    public void handleRecord(ConsumerRecord<String, SensorEventAvro> record) {
+    @Override
+    public void handleRecord(ConsumerRecord<String, SensorsSnapshotAvro> record) {
         log.trace("Handling Record: topic {}, partition {}, offset {}, value {}",
                 record.topic(), record.partition(), record.offset(), record.value());
-        Optional<SensorsSnapshotAvro> sensorsSnapshotAvro = aggregationService.updateState(record.value());
 
-        sensorsSnapshotAvro.ifPresent(snapshotAvro -> {
-            log.info("sending updated snapshot for hubId: {}", snapshotAvro.getHubId());
-            producer.send(new ProducerRecord<>(topicConfig.getSnapshots(), snapshotAvro));
-        });
+        List<Scenario> completeScenarios = analyzerService.analyze(record.value());
+        completeScenarios.forEach(hubEventClient::handleScenario);
     }
 }

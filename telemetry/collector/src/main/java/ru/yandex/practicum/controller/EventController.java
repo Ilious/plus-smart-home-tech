@@ -62,7 +62,7 @@ public class EventController extends CollectorControllerGrpc.CollectorController
             log.info("json hubEvent {}", request);
             if (!hubEvents.containsKey(request.getPayloadCase()))
                 throw new IllegalArgumentException(
-                        String.format("Can't find handler a hub: %s ", request.getPayloadCase())
+                        String.format("Can't find handler for a hub: %s ", request.getPayloadCase())
                 );
 
             HubEventHandler handler = hubEvents.get(request.getPayloadCase());

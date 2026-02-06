@@ -8,6 +8,13 @@ server:
       poll-timeout-ms: 100
       batch-messages-count: 10
 
+grpc:
+  client:
+    hub-router:
+      address: 'static://localhost:59090'
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
 
 spring:
   kafka:
@@ -16,11 +23,9 @@ spring:
     consumer:
       properties:
         "bootstrap.servers": ${spring.kafka.bootstrap-servers}
-        "group.id": aggregator-snapshot-group
         "auto.offset.reset": earliest
         "enable.auto.commit": false
         "key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer"
-        "value.deserializer": "ru.yandex.practicum.deserializer.SensorEventDeserializer"
 
     producer:
       properties:
@@ -29,7 +34,26 @@ spring:
         "acks": 1
         "key.serializer": "org.apache.kafka.common.serialization.StringSerializer"
         "value.serializer": "ru.yandex.practicum.serializer.AvroSerializer"
-        "linger.ms": 0
+  data:
+    jdbc:
+      dialect: postgresql
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://127.0.0.1:6000/telemetry_analyzer}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    hikari:
+      connection-timeout: 30000
+      initialization-fail-timeout: 0
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema-init.sql
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
 
 logging:
   level:

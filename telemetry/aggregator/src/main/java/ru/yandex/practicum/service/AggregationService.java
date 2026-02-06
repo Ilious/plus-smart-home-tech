@@ -17,7 +17,10 @@ public class AggregationService {
 
     public Optional<SensorsSnapshotAvro> updateState(SensorEventAvro event) {
 
-        SensorsSnapshotAvro newSnapshot = snapshots.computeIfAbsent(event.getHubId(), (key) ->
+        String hubId = event.getHubId();
+        String sensorId = event.getId();
+
+        SensorsSnapshotAvro newSnapshot = snapshots.computeIfAbsent(hubId, (key) ->
                 SensorsSnapshotAvro.newBuilder()
                         .setHubId(key)
                         .setTimestamp(Instant.EPOCH)
@@ -27,8 +30,8 @@ public class AggregationService {
 
         Map<String, SensorStateAvro> sensorsState = newSnapshot.getSensorsState();
 
-        if (sensorsState.containsKey(event.getId())) {
-            SensorStateAvro oldState = sensorsState.get(event.getId());
+        if (sensorsState.containsKey(sensorId)) {
+            SensorStateAvro oldState = sensorsState.get(sensorId);
 
             if (oldState.getTimestamp().isAfter(event.getTimestamp()) || oldState.getData().equals(event.getPayload())) {
                 return Optional.empty();
@@ -40,8 +43,9 @@ public class AggregationService {
                 .setData(event.getPayload())
                 .build();
 
-        sensorsState.put(event.getId(), newSensorState);
+        sensorsState.put(sensorId, newSensorState);
         newSnapshot.setTimestamp(event.getTimestamp());
+        newSnapshot.setHubId(hubId);
 
         return Optional.of(newSnapshot);
     }
