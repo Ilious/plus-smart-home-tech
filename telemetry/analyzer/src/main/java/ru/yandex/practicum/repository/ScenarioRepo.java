@@ -18,6 +18,4 @@ public interface ScenarioRepo extends JpaRepository<Scenario, Long> {
     Optional<Scenario> findByHubIdAndName(String hubId, String name);
 
     void removeByHubIdAndId(String hubId, Long id);
-
-    void removeById(Long id);
 }

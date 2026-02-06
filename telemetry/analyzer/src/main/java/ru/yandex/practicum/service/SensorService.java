@@ -19,6 +19,8 @@ public class SensorService {
 
     private final SensorRepo sensorRepo;
 
+    private final SensorMapper sensorMapper;
+
     public void createSensor(String hubId, DeviceAddedEventAvro event) {
         String id = event.getId();
         log.debug("Creation sensor: hubId {}, id {}", hubId, id);
@@ -27,11 +29,7 @@ public class SensorService {
             return;
         }
 
-        Sensor sensor = Sensor.builder()
-                .id(event.getId())
-                .hubId(hubId)
-                .build();
-        sensorRepo.save(sensor);
+        sensorRepo.save(sensorMapper.toSensor(hubId, event));
     }
 
     public void removeByHubIdAndId(String hubId, String id) {
