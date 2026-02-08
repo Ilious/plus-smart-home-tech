@@ -10,7 +10,6 @@ import java.util.Map;
 @Entity
 @Table(name = "scenarios")
 @Getter @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Scenario {
