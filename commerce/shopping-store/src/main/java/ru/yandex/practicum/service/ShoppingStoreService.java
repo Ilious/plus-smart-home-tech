@@ -88,7 +88,7 @@ public class ShoppingStoreService {
         return true;
     }
 
-    public Product getActiveProductOrThrow(UUID productId) {
+    private Product getActiveProductOrThrow(UUID productId) {
         log.trace("get active product or throw: {}", productId);
         Optional<Product> productById = productRepo.findById(productId);
         if (productById.isEmpty() || productById.get().getProductState().equals(ProductState.DEACTIVATE))
