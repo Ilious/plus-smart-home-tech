@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS products (
-    productId BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    productId UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_name VARCHAR NOT NULL,
     description VARCHAR NOT NULL,
     image_src VARCHAR,
