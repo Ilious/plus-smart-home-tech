@@ -1,0 +1,33 @@
+server:
+  port: 0
+
+app:
+  api-version: "/api/v1"
+
+spring:
+  application:
+    name: shopping-cart
+  data:
+    jdbc:
+      dialect: postgresql
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://127.0.0.1:6001/commerce_shopping_cart}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    hikari:
+      connection-timeout: 30000
+      initialization-fail-timeout: 0
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema-init.sql
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+
+logging:
+  level:
+    ru.yandex.practicum: TRACE
