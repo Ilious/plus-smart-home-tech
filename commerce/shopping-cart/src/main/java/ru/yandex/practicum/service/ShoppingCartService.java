@@ -6,16 +6,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dao.ShoppingCart;
 import ru.yandex.practicum.dao.ShoppingCartState;
-import ru.yandex.practicum.exception.EntityNotFoundException;
+import ru.yandex.practicum.dto.shopping.cart.ChangeProductQuantityRequest;
+import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
 import ru.yandex.practicum.exception.NotAuthorizedException;
 import ru.yandex.practicum.mapper.ShoppingCartMapper;
 import ru.yandex.practicum.repo.ShoppingCartRepo;
-import ru.yandex.practicum.dto.shopping.cart.ChangeProductQuantityRequest;
-import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -44,7 +42,9 @@ public class ShoppingCartService {
         ShoppingCart cartByUsername = shoppingCartRepo.findOrCreateByUsername(username);
         verifyCartActiveOrThrow(cartByUsername, username);
 
-        request.forEach((id, quantity) -> cartByUsername.getProducts().merge(id, quantity, Long::sum));
+        request.forEach((id, quantity) ->
+                cartByUsername.getProducts().merge(id, quantity, Long::sum));
+        cartByUsername.setProducts(request);
 
         return shoppingCartMapper.toDto(cartByUsername);
     }
@@ -52,30 +52,24 @@ public class ShoppingCartService {
     public void deactivateCart(String username) {
         validateUserOrThrow(username);
 
-        ShoppingCart cart = shoppingCartRepo.getByUsername(username);
-        if (cart.getShoppingCartState().equals(ShoppingCartState.DEACTIVATE))
-            log.info("Card is deactivated already by username {}", username);
-
-        cart.setShoppingCartState(ShoppingCartState.DEACTIVATE);
+        shoppingCartRepo.findAllByUsernameAndShoppingCartState(username, ShoppingCartState.ACTIVE)
+                .forEach(cart -> {
+                    cart.setShoppingCartState(ShoppingCartState.DEACTIVATE);
+                });
     }
 
-    public void removeProducts(String username, List<UUID> productIds) {
+    public ShoppingCartDto removeProducts(String username, List<UUID> productIds) {
         validateUserOrThrow(username);
 
-        Optional<ShoppingCart> byUsername = shoppingCartRepo.findByUsername(username);
-        if (byUsername.isPresent()) {
-            ShoppingCart shoppingCart = byUsername.get();
-            if (shoppingCart.getProducts().isEmpty()) {
-                throw new EntityNotFoundException("ids", ShoppingCart.class);
-            }
+        ShoppingCart cart = shoppingCartRepo.findOrCreateByUsername(username);
+        productIds.forEach(cart.getProducts()::remove);
 
-            productIds.forEach(shoppingCart.getProducts()::remove);
-        }
+        return shoppingCartMapper.toDto(shoppingCartRepo.save(cart));
     }
 
     public ShoppingCartDto updateProductQuantity(String username, ChangeProductQuantityRequest request) {
         validateUserOrThrow(username);
-        ShoppingCart cart = shoppingCartRepo.getByUsername(username);
+        ShoppingCart cart = shoppingCartRepo.findOrCreateByUsername(username);
         verifyCartActiveOrThrow(cart, username);
 
         cart.getProducts().put(request.getProductId(), request.getNewQuantity());

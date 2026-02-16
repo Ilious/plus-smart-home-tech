@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS products (
     description VARCHAR NOT NULL,
     image_src VARCHAR,
     price DECIMAL CHECK (price > 0),
-    quantityState VARCHAR NOT NULL,
-    productState VARCHAR NOT NULL,
-    category VARCHAR NOT NULL
+    quantity_state VARCHAR NOT NULL,
+    product_state VARCHAR NOT NULL,
+    product_category VARCHAR NOT NULL
 )

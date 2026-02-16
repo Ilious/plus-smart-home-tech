@@ -10,11 +10,11 @@ import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 
 public interface WarehouseOperations {
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.CREATED)
     @PutMapping
     void addNewProductToWarehouse(@RequestBody NewProductInWarehouseRequest request);
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/add")
     void addProductQuantity(@RequestBody AddProductToWarehouseRequest request);
 

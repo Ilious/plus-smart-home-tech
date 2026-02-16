@@ -2,11 +2,13 @@ package ru.yandex.practicum.dto.warehouse;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 @Builder
 @Getter @Setter @ToString
-@AllArgsConstructor
 public class BookedProductsDto {
 
     @NotNull(message = "weight can't be null")

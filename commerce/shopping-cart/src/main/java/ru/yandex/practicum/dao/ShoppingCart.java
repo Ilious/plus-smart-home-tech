@@ -27,7 +27,7 @@ public class ShoppingCart {
     private String username;
 
     @ElementCollection
-    @CollectionTable(name="shopping_carts_products")
+    @CollectionTable(name = "shopping_cart_products", joinColumns = @JoinColumn(name = "shopping_cart_id"))
     @MapKeyColumn(name="product_id")
     @Column(name = "quantity")
     private Map<UUID, Long> products = new HashMap<>();

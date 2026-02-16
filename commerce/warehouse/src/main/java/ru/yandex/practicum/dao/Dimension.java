@@ -9,9 +9,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class Dimension {
 
-    @Min(value = 1, message = "weight should be at least 1")
-    @NotNull(message = "weight can't be null")
-    private Double weight;
+    @Min(value = 1, message = "width should be at least 1")
+    @NotNull(message = "width can't be null")
+    private Double width;
 
     @Min(value = 1, message = "height should be at least 1")
     @NotNull(message = "height can't be null")

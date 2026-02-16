@@ -2,13 +2,13 @@ package ru.yandex.practicum.dto.shopping.cart;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.UUID;
 
 @Getter @Setter @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChangeProductQuantityRequest {
 
     @NotNull(message = "request should have product Id")

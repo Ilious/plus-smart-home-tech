@@ -1,8 +1,8 @@
 package ru.yandex.practicum.dao;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import ru.yandex.practicum.enums.ProductCategory;
 import ru.yandex.practicum.enums.ProductState;
@@ -20,13 +20,14 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "product_id")
     private UUID productId;
 
-    @Max(100)
-    @Column(nullable = false)
+    @Size(max = 100)
+    @Column(nullable = false, name = "product_name")
     private String productName;
 
-    @Max(255)
+    @Size(max = 255)
     @Column(nullable = false)
     private String description;
 
@@ -37,14 +38,14 @@ public class Product {
     private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "quantity_state")
     private QuantityState quantityState;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "product_state")
     private ProductState productState;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "product_category", nullable = false)
     private ProductCategory category;
 }

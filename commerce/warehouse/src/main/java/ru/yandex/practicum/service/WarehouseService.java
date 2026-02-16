@@ -79,7 +79,7 @@ public class WarehouseService {
 
             Dimension dimension = warehouseProduct.getDimension();
 
-            volume += dimension.getDepth() * dimension.getWeight() * dimension.getHeight() * quantity;
+            volume += dimension.getDepth() * dimension.getWidth() * dimension.getHeight() * quantity;
 
             if (warehouseProduct.getFragile())
                 fragile = true;
@@ -101,8 +101,8 @@ public class WarehouseService {
                 .city(address)
                 .country(address)
                 .street(address)
-                .home(address)
-                .apartment(address)
+                .house(address)
+                .flat(address)
                 .build();
     }
 }

@@ -2,13 +2,11 @@ package ru.yandex.practicum.dto.warehouse;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 @Getter @Setter @ToString
-@AllArgsConstructor
 public class DimensionDto {
 
     @NotNull(message = "width can't be null")

@@ -2,8 +2,7 @@ server:
   port: 0
 
 app:
-  api-version:
-      "api/v1"
+  api-version: "/api/v1"
 
 spring:
   application:

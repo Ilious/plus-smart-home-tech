@@ -24,9 +24,8 @@ public interface ShoppingCartOperations {
 
     @PostMapping("/change-quantity")
     ShoppingCartDto updateProductQuantity(@RequestParam String username,
-                                                       @Valid
-                                                       @RequestBody ChangeProductQuantityRequest request);
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+                                          @Valid @RequestBody ChangeProductQuantityRequest request);
+
     @PostMapping("/remove")
-    void removeProducts(@RequestParam String username, List<UUID> productIds);
+    ShoppingCartDto removeProducts(@RequestParam String username, @RequestBody List<UUID> productIds);
 }

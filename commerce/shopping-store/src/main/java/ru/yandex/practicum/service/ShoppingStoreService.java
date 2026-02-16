@@ -2,6 +2,8 @@ package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dao.Product;
@@ -13,8 +15,6 @@ import ru.yandex.practicum.exception.EntityNotFoundException;
 import ru.yandex.practicum.mapper.ProductMapper;
 import ru.yandex.practicum.repo.ProductRepo;
 
-import java.awt.print.Pageable;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,18 +32,18 @@ public class ShoppingStoreService {
     public ProductDto getProduct(UUID productId) {
         log.debug("Get product by id: {}", productId);
 
-        Product product = getActiveProductOrThrow(productId);
+        Product product = productRepo.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException(String.valueOf(productId), Product.class));
 
         return productMapper.toDto(product);
     }
 
     @Transactional(readOnly = true)
-    public List<ProductDto> getProducts(ProductCategory category, Pageable pageable) {
+    public Page<ProductDto> getProducts(ProductCategory category, Pageable pageable) {
         log.debug("Get products");
 
-        return productRepo.findAllByCategory(category, pageable).stream()
-                .map(productMapper::toDto)
-                .toList();
+        return productRepo.findAllByCategory(category, pageable)
+                .map(productMapper::toDto);
     }
 
     public ProductDto createProduct(ProductDto dto) {
@@ -58,9 +58,17 @@ public class ShoppingStoreService {
     public ProductDto updateProduct(ProductDto productDto) {
         log.debug("update product: name {}", productDto.getProductName());
 
+        if (productDto.getProductId() == null) {
+            Product newProduct = productMapper.toEntity(productDto);
+
+            Product saved = productRepo.save(newProduct);
+            return productMapper.toDto(saved);
+        }
+
         Product product = getActiveProductOrThrow(productDto.getProductId());
 
-        productRepo.save(productMapper.updateFields(product, productDto));
+        productMapper.updateFields(product, productDto);
+        productRepo.save(product);
 
         return productDto;
     }
@@ -72,10 +80,11 @@ public class ShoppingStoreService {
         product.setProductState(ProductState.DEACTIVATE);
     }
 
-    public boolean setProductQuantityState(SetProductQuantityStateRequest quantityStateRequest) {
-        log.debug("set product quantity state: {}", quantityStateRequest);
-        Product product = getActiveProductOrThrow(quantityStateRequest.getProductId());
-        product.setQuantityState(quantityStateRequest.getQuantityState());
+    public boolean setProductQuantityState(SetProductQuantityStateRequest request) {
+        log.debug("set product quantity state: {}", request);
+        Product product = productRepo.findById(request.getProductId())
+                .orElseThrow(() -> new EntityNotFoundException(String.valueOf(request.getProductId()), Product.class));
+        product.setQuantityState(request.getQuantityState());
         return true;
     }
 

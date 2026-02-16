@@ -19,9 +19,9 @@ public class Address {
 
     private String street;
 
-    private String home;
+    private String house;
 
-    private String apartment;
+    private String flat;
 
     private static final String CURRENT_ADDRESS = ADDRESSES[Random.from(new SecureRandom())
             .nextInt(0, ADDRESSES.length)];

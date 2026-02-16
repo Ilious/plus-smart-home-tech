@@ -2,27 +2,29 @@ package ru.yandex.practicum.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.yandex.practicum.dao.ShoppingCart;
-import ru.yandex.practicum.exception.EntityNotFoundException;
+import ru.yandex.practicum.dao.ShoppingCartState;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public interface ShoppingCartRepo extends JpaRepository<ShoppingCart, UUID> {
 
-    Optional<ShoppingCart> findByUsername(String username);
+    List<ShoppingCart> findAllByUsernameAndShoppingCartState(String username, ShoppingCartState state);
 
-    default ShoppingCart getByUsername(String username) {
-        if (findByUsername(username).isPresent()) {
-            return findByUsername(username).get();
-        }
-        throw new EntityNotFoundException("username", username, ShoppingCart.class);
-    }
+    List<ShoppingCart> findAllByUsername(String username);
 
     default ShoppingCart findOrCreateByUsername(String username) {
-        return findByUsername(username)
-                .orElse(this.save(ShoppingCart.builder()
-                        .username(username)
-                        .build()
-                ));
+        List<ShoppingCart> activeCarts = findAllByUsernameAndShoppingCartState(username, ShoppingCartState.ACTIVE);
+
+        if (!activeCarts.isEmpty()) {
+            return activeCarts.getFirst();
+        }
+
+        return this.save(ShoppingCart.builder()
+                .username(username)
+                .products(new HashMap<>())
+                .shoppingCartState(ShoppingCartState.ACTIVE)
+                .build());
     }
 }

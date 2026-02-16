@@ -1,6 +1,9 @@
 package ru.yandex.practicum.dto.warehouse;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data
@@ -14,7 +17,7 @@ public class AddressDto {
 
     private String street;
 
-    private String home;
+    private String house;
 
-    private String apartment;
+    private String flat;
 }
