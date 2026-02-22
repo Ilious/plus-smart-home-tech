@@ -8,6 +8,9 @@ import ru.yandex.practicum.dto.warehouse.*;
 import ru.yandex.practicum.feign.operation.WarehouseOperations;
 import ru.yandex.practicum.service.WarehouseService;
 
+import java.util.Map;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("${app.api-version}" + "/warehouse")
 @RequiredArgsConstructor
