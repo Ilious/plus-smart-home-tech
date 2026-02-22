@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.dto.shopping.store.ProductDto;
 import ru.yandex.practicum.dto.shopping.store.SetProductQuantityStateRequest;
 import ru.yandex.practicum.enums.ProductCategory;
-import ru.yandex.practicum.feign.ShoppingStoreOperations;
+import ru.yandex.practicum.feign.operation.ShoppingStoreOperations;
 import ru.yandex.practicum.service.ShoppingStoreService;
 
 import java.util.UUID;

@@ -2,6 +2,8 @@ package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dao.ShoppingCart;
@@ -26,6 +28,7 @@ public class ShoppingCartService {
 
     private final ShoppingCartMapper shoppingCartMapper;
 
+    @Cacheable(cacheNames = "carts", key = "#username")
     @Transactional(readOnly = true)
     public ShoppingCartDto getCartByUsername(String username) {
         log.debug("Get cart by username {}", username);
@@ -36,6 +39,7 @@ public class ShoppingCartService {
         return shoppingCartMapper.toDto(cartByUsername);
     }
 
+    @CacheEvict(cacheNames = "carts", key = "#username")
     public ShoppingCartDto updateCart(String username, Map<UUID, Long> request) {
         validateUserOrThrow(username);
 
@@ -44,20 +48,19 @@ public class ShoppingCartService {
 
         request.forEach((id, quantity) ->
                 cartByUsername.getProducts().merge(id, quantity, Long::sum));
-        cartByUsername.setProducts(request);
 
         return shoppingCartMapper.toDto(cartByUsername);
     }
 
+    @CacheEvict(cacheNames = "carts", key = "#username")
     public void deactivateCart(String username) {
         validateUserOrThrow(username);
 
         shoppingCartRepo.findAllByUsernameAndShoppingCartState(username, ShoppingCartState.ACTIVE)
-                .forEach(cart -> {
-                    cart.setShoppingCartState(ShoppingCartState.DEACTIVATE);
-                });
+                .forEach(cart -> cart.setShoppingCartState(ShoppingCartState.DEACTIVATE));
     }
 
+    @CacheEvict(cacheNames = "carts", key = "#username")
     public ShoppingCartDto removeProducts(String username, List<UUID> productIds) {
         validateUserOrThrow(username);
 
@@ -67,6 +70,7 @@ public class ShoppingCartService {
         return shoppingCartMapper.toDto(shoppingCartRepo.save(cart));
     }
 
+    @CacheEvict(cacheNames = "carts", key = "#username")
     public ShoppingCartDto updateProductQuantity(String username, ChangeProductQuantityRequest request) {
         validateUserOrThrow(username);
         ShoppingCart cart = shoppingCartRepo.findOrCreateByUsername(username);

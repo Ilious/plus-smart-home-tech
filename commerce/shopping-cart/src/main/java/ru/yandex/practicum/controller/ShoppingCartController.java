@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.dto.shopping.cart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.shopping.cart.ShoppingCartDto;
-import ru.yandex.practicum.feign.ShoppingCartOperations;
+import ru.yandex.practicum.feign.operation.ShoppingCartOperations;
 import ru.yandex.practicum.service.ShoppingCartService;
 
 import java.util.List;

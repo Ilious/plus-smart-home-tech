@@ -67,6 +67,9 @@ services:
       sh -c "
       echo 'CREATE DATABASE commerce_shopping_store;
       CREATE DATABASE commerce_shopping_cart;
+      CREATE DATABASE commerce_order;
+      CREATE DATABASE commerce_payment;
+      CREATE DATABASE commerce_delivery;
       CREATE DATABASE commerce_warehouse;' > /docker-entrypoint-initdb.d/init.sql;
       exec docker-entrypoint.sh postgres
       "
