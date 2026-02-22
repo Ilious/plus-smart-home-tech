@@ -2,10 +2,15 @@ package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dao.Scenario;
-import ru.yandex.practicum.kafka.telemetry.event.*;
+import ru.yandex.practicum.kafka.telemetry.event.DeviceAddedEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.DeviceRemovedEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.ScenarioAddedEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.ScenarioRemovedEventAvro;
 import ru.yandex.practicum.mapper.helper.ScenarioMappingHelper;
 import ru.yandex.practicum.repository.ScenarioRepo;
 
@@ -24,6 +29,7 @@ public class ScenarioService {
 
     private final ScenarioMappingHelper scenarioMapper;
 
+    @Cacheable(cacheNames = "scenarios", key = "#hubId")
     @Transactional(readOnly = true)
     public List<Scenario> findAllByHubId(String hubId) {
         log.debug("findAllByHubId: hubId {}", hubId);
@@ -37,12 +43,14 @@ public class ScenarioService {
         sensorService.createSensor(hubId, event);
     }
 
+    @CacheEvict(cacheNames = "sensors", key = "#event.getId() + '-' + #hubId")
     public void removeDevice(String hubId, DeviceRemovedEventAvro event) {
         log.debug("RemoveDevice: hubId {}, id {}", hubId, event.getId());
 
         sensorService.removeByHubIdAndId(hubId, event.getId());
     }
 
+    @CacheEvict(cacheNames = "scenarios", key = "#hubId")
     public void addScenario(String hubId, ScenarioAddedEventAvro event) {
         log.debug("Addition scenario: hubId {}, name {}", hubId, event.getName());
 
@@ -51,6 +59,7 @@ public class ScenarioService {
         scenarioRepo.save(scenario);
     }
 
+    @CacheEvict(cacheNames = "scenarios", key = "#hubId")
     public void removeScenario(String hubId, ScenarioRemovedEventAvro event) {
         log.debug("RemoveScenario: hubId {}, name {}", hubId, event.getName());
 

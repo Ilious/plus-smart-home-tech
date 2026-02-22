@@ -7,6 +7,9 @@ server:
     consumer:
       poll-timeout-ms: 100
       batch-messages-count: 10
+app:
+  cache:
+    default-ttl-min: 30
 
 grpc:
   server:

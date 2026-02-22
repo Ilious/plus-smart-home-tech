@@ -1,4 +1,4 @@
-package ru.yandex.practicum.feign;
+package ru.yandex.practicum.feign.operation;
 
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
