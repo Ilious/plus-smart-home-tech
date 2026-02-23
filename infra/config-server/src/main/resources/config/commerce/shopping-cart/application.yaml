@@ -3,6 +3,8 @@ server:
 
 app:
   api-version: "/api/v1"
+  cache:
+    default-ttl-min: 0.5
 
 spring:
   application:

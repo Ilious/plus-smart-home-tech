@@ -2,6 +2,8 @@ package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class ShoppingStoreService {
 
     private final ProductMapper productMapper;
 
+    @Cacheable(cacheNames = "products", key = "#productId")
     @Transactional(readOnly = true)
     public ProductDto getProduct(UUID productId) {
         log.debug("Get product by id: {}", productId);
@@ -55,6 +58,7 @@ public class ShoppingStoreService {
         return dto;
     }
 
+    @CacheEvict(cacheNames = "products", key = "#productDto.getProductId()")
     public ProductDto updateProduct(ProductDto productDto) {
         log.debug("update product: name {}", productDto.getProductName());
 
@@ -73,6 +77,7 @@ public class ShoppingStoreService {
         return productDto;
     }
 
+    @CacheEvict(cacheNames = "products", key = "#productId")
     public void removeProductFromStore(UUID productId) {
         log.debug("remove product from store: {}", productId);
         Product product = getActiveProductOrThrow(productId);
@@ -80,6 +85,7 @@ public class ShoppingStoreService {
         product.setProductState(ProductState.DEACTIVATE);
     }
 
+    @CacheEvict(cacheNames = "products", key = "#request.getProductId()")
     public boolean setProductQuantityState(SetProductQuantityStateRequest request) {
         log.debug("set product quantity state: {}", request);
         Product product = productRepo.findById(request.getProductId())
