@@ -101,6 +101,7 @@ public class DeliveryService {
     public BigDecimal calculateDeliveryCost(OrderDto orderDto) {
         log.debug("Calculating delivery cost by order id: {}", orderDto.getOrderId());
         Delivery delivery = deliveryRepo.getDeliveryByOrderId(orderDto.getOrderId());
+        log.trace("Calculating delivery cost for delivery {} by order {}", delivery, orderDto.getOrderId());
 
         BigDecimal cost = BigDecimal.valueOf(DELIVERY_COST);
 
@@ -126,6 +127,7 @@ public class DeliveryService {
             cost = cost.add(addressCost);
         }
 
+        log.trace("Final cost {} by order {}", cost.setScale(2, RoundingMode.HALF_UP), orderDto.getOrderId());
         return cost.setScale(2, RoundingMode.HALF_UP);
     }
 
