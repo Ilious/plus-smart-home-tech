@@ -1,0 +1,13 @@
+server:
+  port: 8761
+
+eureka:
+  instance:
+    hostname: localhost
+  server:
+    eviction-interval-timer-in-ms: 2000
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname:localhost}:${eureka.instance.port:8761}/eureka/

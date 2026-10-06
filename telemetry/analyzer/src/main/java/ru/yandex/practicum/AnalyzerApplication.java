@@ -2,12 +2,10 @@ package ru.yandex.practicum;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ConfigurableApplicationContext;
-import ru.yandex.practicum.config.KafkaConfigData;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication
-@EnableConfigurationProperties(KafkaConfigData.class)
+@ConfigurationPropertiesScan
 public class AnalyzerApplication {
     public static void main(String[] args) {
         SpringApplication.run(AnalyzerApplication.class, args);

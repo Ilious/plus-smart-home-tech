@@ -1,38 +1,20 @@
-server:
-  kafka:
-    topic-config:
-      hubs: telemetry.hubs.v1
-      sensors: telemetry.sensors.v1
-      snapshots: telemetry.snapshots.v1
-    consumer:
-      poll-timeout-ms: 100
-      batch-messages-count: 10
-
-
 spring:
-  kafka:
-    bootstrap-servers: ${SERVER_KAFKA_ADDRESS:localhost:9092}
+  application:
+    name: aggregator
+  config:
+    import: "configserver:"
+  cloud:
+    config:
+      fail-fast: true
+      retry:
+        max-interval: 10000
+        use-random-policy: true
 
-    consumer:
-      properties:
-        "bootstrap.servers": ${spring.kafka.bootstrap-servers}
-        "group.id": aggregator-snapshot-group
-        "auto.offset.reset": earliest
-        "enable.auto.commit": false
-        "key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer"
-        "value.deserializer": "ru.yandex.practicum.deserializer.SensorEventDeserializer"
+      discovery:
+        service-id: config-server
+        enabled: true
 
-    producer:
-      properties:
-        "bootstrap.servers": ${spring.kafka.bootstrap-servers}
-        "client.id": "aggregator-producer"
-        "acks": 1
-        "key.serializer": "org.apache.kafka.common.serialization.StringSerializer"
-        "value.serializer": "ru.yandex.practicum.serializer.AvroSerializer"
-        "linger.ms": 0
-
-logging:
-  level:
-    ru.yandex.practicum: TRACE
-    org.apache.kafka: WARN
-    org.springframework.kafka: WARN
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${eureka.instance.hostname:localhost}:${eureka.instance.port:8761}/eureka

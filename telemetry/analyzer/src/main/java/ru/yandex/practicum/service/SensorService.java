@@ -2,6 +2,8 @@ package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dao.Sensor;
@@ -34,12 +36,14 @@ public class SensorService {
         sensorRepo.save(sensorMapper.toSensor(hubId, event));
     }
 
+    @CacheEvict(cacheNames = "sensors", key = "#id + '-' + #hubId")
     public void removeByHubIdAndId(String hubId, String id) {
         log.debug("Removing sensor: hubId {}, id {}", hubId, id);
 
         sensorRepo.removeByHubIdAndId(hubId, id);
     }
 
+    @Cacheable(cacheNames = "sensors", key = "#id + '-' + #hubId")
     @Transactional(readOnly = true)
     public Optional<Sensor> findByIdAndHubId(String id, String hubId) {
         log.debug("Find sensor: hubId {}, id {}", hubId, id);
